@@ -264,7 +264,7 @@ section.image_layout h1 {
     z-index: 10;
     transform: translate(-50%, -50%);
     width: 80%;
-    height: 80vh;
+    height: 100%;
     background-color: #f9f9f9;
     box-shadow: 0px 5px 50px rgba(0, 0, 0, 0.35);
     border-radius: 10px;
@@ -323,8 +323,9 @@ section.image_layout h1 {
     height: 80%;
     width: auto;
     max-width: 80%;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 10px;
+    margin-bottom: 3em;
 }
 
 .controls {
@@ -353,7 +354,7 @@ section.image_layout h1 {
 
 .all_info {
     position: absolute;
-    bottom: 0px;
+    bottom: -20px;
     left: 30px;
     display: flex;
     justify-content: space-between;
@@ -415,5 +416,12 @@ section.image_layout h1 {
     .app_btn {
         padding: 0.3em;
         font-size: 0.9em;
+    }
+
+    .right_side {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 1em;
     }
 }
