@@ -1,0 +1,129 @@
+const scrollNext = document.querySelector("#next");
+const scrollPrev = document.querySelector("#prev");
+const categoryMenu = document.querySelector(".category");
+const categoryItem = document.querySelectorAll(".category .nav_links");
+const search_input = document.querySelector(".search_input");
+const grid_wrapper = document.querySelector(".grid_wrapper");
+const large_img = document.querySelector(".large_img");
+const image_popup = document.querySelector(".image_popup");
+const close_btn = document.querySelector(".close_btn");
+const overlay = document.querySelector(".overlay");
+const prvBtn = document.querySelector(".pre-btn");
+const nextBtn = document.querySelector(".next-btn");
+const download = document.querySelector('.down_btn')
+
+let current = 0;
+
+//  Slider Left
+const slideLeft = () => {
+  let slider = document.querySelector("#slider");
+  slider.scrollLeft = slider.scrollLeft - 500;
+};
+//   Slider Right
+const slideRight = () => {
+  let slider = document.querySelector("#slider");
+  slider.scrollLeft = slider.scrollLeft + 500;
+};
+
+scrollPrev.addEventListener("click", slideLeft);
+scrollNext.addEventListener("click", slideRight);
+
+//Disbale Next Prev When we scroll down
+window.addEventListener("scroll", function () {
+  categoryMenu.classList.toggle("hidden", window.scrollY > 0);
+});
+
+//   When User Click Any Navlinks show active class
+function setMenuActive() {
+  categoryItem.forEach((n) => n.classList.remove("active"));
+  this.classList.add("active");
+}
+
+
+categoryItem.forEach((n) => n.addEventListener("click", setMenuActive));
+
+search_input.addEventListener("keyup", (e) => {
+  if (e.key === "Enter") {
+    if (search_input.value === "") return alert("Search be filed require");
+    sessionStorage.setItem("search", search_input.value);
+    window.location.reload();
+  }
+});
+
+const searchData = sessionStorage.getItem("search");
+document.querySelector('.searchName').innerHTML = searchData;
+document.title = `Unsplash Clone - Search ${searchData}`;
+
+//Validation
+if (!searchData) alert("sorry something wrong");
+
+//  base url
+const access_key = "D6GVL6ykNHf5e5E7lI1DUic09zT5xuEZ9zqWROZSrys";
+const search_photo_url = `https://api.unsplash.com/search/photos?client_id=${access_key}&query=${searchData}&per_page=50`;
+
+// getImages()
+(async () => {
+  const res = await fetch(search_photo_url);
+  const data = await res.json();
+  setSlide(data?.results);
+  setImage(data?.results);
+})();
+
+function setImage(data) {
+  let html = "";
+  data.forEach((item) => {
+    const { urls, user } = item;
+
+    html += `
+        <img src=${urls?.regular} class="gallary_img" alt=${user?.username} />
+        `;
+  });
+
+  grid_wrapper.innerHTML = html;
+
+  //When user Click Any Particular image
+  const gallary_img = document.querySelectorAll(".gallary_img");
+
+  gallary_img.forEach((singleImg, index) => {
+    const { links, likes, user } = data[index];
+    singleImg.addEventListener("click", () => {
+      overlay.classList.add("active");
+      image_popup.classList.add("show");
+      large_img.src = singleImg.src;
+      document.querySelector(".viewCount").innerHTML = likes;
+      download.setAttribute('href', links?.download)
+      document.querySelector(".userName").innerHTML = user?.username;
+    });
+
+    overlay.addEventListener("click", closeBtn);
+    close_btn.addEventListener("click", closeBtn);
+  });
+}
+
+//When user Close Popup
+function closeBtn() {
+  image_popup.classList.remove("show");
+  overlay.classList.remove("active");
+}
+
+function setSlide(data) {
+  //Slide Next Images
+  prvBtn.addEventListener("click", () => {
+    if (current > 0) {
+      current--;
+      const { urls, user } = data[current];
+      large_img.src = urls?.regular;
+      large_img.alt = user?.username;
+    }
+  });
+
+  // Previous Image When User click prev button
+  nextBtn.addEventListener("click", () => {
+    if (current < data.length - 1) {
+      current++;
+      const { urls, user } = data[current];
+      large_img.src = urls?.regular;
+      large_img.alt = user?.username;
+    }
+  });
+}
